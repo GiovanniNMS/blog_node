@@ -1,0 +1,34 @@
+//Carregando modulos
+const mongoose = require('mongoose')
+const express = require('express')
+const app = express()
+const handlebars = require('express-handlebars')
+const boryparser = require('body-parser')
+const admin = require("./routes/admin")
+const path = require("path")
+//Conf 
+    //bory-parser
+        app.use(boryparser.urlencoded({extended: true}))
+        app.use(boryparser.json())
+    
+    //HandleBars
+        app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}))
+        app.set('view engine', 'handlebars')
+    
+    //Mongoose
+        //mongoose.connect("mongodb://localhost: 2717/")
+
+    //Public
+        app.use(express.static(path.join(__dirname,"public")))
+//Rotas
+
+
+//Outros
+    app.use("/admin", admin)
+
+
+
+const porta = 8081
+app.listen(porta, ()=>{
+    console.log('Servidor ok!')
+})
