@@ -12,7 +12,7 @@ const categoria = new schema({
     }, 
     date:{
         type: Date, 
-        default: now()
+        default: Date.now()
     }
 })
 

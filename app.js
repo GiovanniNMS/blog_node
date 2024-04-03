@@ -3,13 +3,29 @@ const mongoose = require("mongoose")
 const express = require('express')
 const app = express()
 const handlebars = require('express-handlebars')
-const boryparser = require('body-parser')
+const bodyoparser = require('body-parser')
 const admin = require("./routes/admin")
 const path = require("path")
+const session = require('express-session')
+const flash = require('connect-flash')
 //Conf 
+
+//sessões
+app.use(session({
+    secret: "secretSegura",
+    saveUninitialized: true
+}))
+app.use(flash())
+
+//
+app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash("success_msg")
+    res.locals.error_msg = req.flash("error_msg")
+    next()
+})
 //bory-parser
-app.use(boryparser.urlencoded({ extended: true }))
-app.use(boryparser.json())
+app.use(bodyoparser.urlencoded({ extended: true }))
+app.use(bodyoparser.json())
 
 //HandleBars
 app.engine('handlebars', handlebars.engine({ defaultLayout: 'main' }))
@@ -25,6 +41,10 @@ mongoose.connect("mongodb://127.0.0.1:27017/node_bd").then(function() {
 
 //Public
 app.use(express.static(path.join(__dirname, "public")))
+app.use((req, res, next) => {
+    console.log("MIDDLEWARE OK!")
+    next()
+})
 //Rotas
 
 
