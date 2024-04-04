@@ -1,3 +1,6 @@
+{{#each erros}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{/each}}
 <h2>Lista de categorias</h2>
 <hr>
 <a href="/admin/categorias/add"><button class="btn btn-success" >Nova Categoria</button></a>
@@ -6,8 +9,16 @@
     <div class="card mt-4">
         <div class="card-body">
             <h4>{{nome}}</h4>
-            <small>Slug: {{slug}}</small>   
+            <small>Slug: {{slug}}</small>
+            <br>
             <small>Data de criação: {{date}}</small>
+            <br>
+           <a href="/admin/categorias/edit/{{_id}}"><button type="button" class="btn btn-success mt-3">Editar</button></a>
+           <form action="/admin/categorias/deletar" method="post">
+                <input type="hidden" name="id" value="{{_id}}">
+                <input type="hidden" name="nome" value="{{nome}}">
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+           </form>
         </div>
     </div>
 {{else}}
