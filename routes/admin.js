@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 require("../models/Categoria")
+require("../models/Postagem")
+const Postagem = mongoose.model("postagens")
 const Categoria = mongoose.model("categorias")
 
 router.get('/', (req, res)=>{
@@ -107,9 +109,37 @@ router.get("/postagens/add", (req, res)=>{
     Categoria.find().lean().then((categorias)=>{
         res.render("admin/addpostagens", {categorias: categorias})
     }).catch((erro)=>{
-
-    })
+        
+    })  
     
 })
+router.post("/postagens/nova", (req, res)=>{
+    const novaPoatagem = {
+        titulo: req.body.titulo, 
+        slug: req.body.slug,
+        descricao: req.body.descricao,
+        conteudo: req.body.conteudo,
+        categoria: req.body.categoria
+    }
 
+    var erros = []
+    if (req.body.categoria == 0) {
+        erros.push({texto: "Categoria invalida! Tente novamente."})
+        
+    }
+    if (erros.length > 0) {
+        res.render("admin/addpostagens", {erros: erros})
+    }else(
+        new Postagem(novaPoatagem).save().then(()=>{
+        
+            req.flash("success_msg","Postagem Cadastrada!")
+            res.redirect("/admin/postagens")
+        }).catch((erro)=>{
+            req.flash("error_msg", "Erro ao cadastrar postagem! Tente Novamente")
+            res.redirect("/admin/postagens/add")
+            console.log(erro)
+        })
+    )
+    
+})
 module.exports = router
