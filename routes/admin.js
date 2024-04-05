@@ -98,4 +98,18 @@ router.post("/categorias/deletar", (req, res)=>{
     })
 })
 
+router.get("/postagens", (req, res)=>{
+    
+    res.render("admin/postagens")
+})
+
+router.get("/postagens/add", (req, res)=>{
+    Categoria.find().lean().then((categorias)=>{
+        res.render("admin/addpostagens", {categorias: categorias})
+    }).catch((erro)=>{
+
+    })
+    
+})
+
 module.exports = router
