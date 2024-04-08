@@ -77,7 +77,7 @@ router.post("/categorias/edit", (req, res)=>{
         categorias.slug = req.body.slug
 
         categorias.save().then(()=>{
-            req.flash("success_msg", "Alterado com sucesso!")
+            req.flash("success_msg", "Categoria Editada!")
             res.redirect("/admin/categorias")
         }).catch((erro)=>{
             req.flash("Erro interno ao editar categoria!")
@@ -90,8 +90,8 @@ router.post("/categorias/edit", (req, res)=>{
      })
 })
 
-router.post("/categorias/deletar", (req, res)=>{
-    Categoria.deleteOne({_id: req.body.id}).then(()=>{
+router.get("/categorias/deletar/:id", (req, res)=>{
+    Categoria.deleteOne({_id: req.params.id}).then(()=>{
         req.flash("success_msg", "Categoria " + req.body.nome + " deletada!")
         res.redirect("/admin/categorias")
     }).catch((erro)=>{
@@ -101,8 +101,12 @@ router.post("/categorias/deletar", (req, res)=>{
 })
 
 router.get("/postagens", (req, res)=>{
-    
-    res.render("admin/postagens")
+    Postagem.find().populate("categoria").sort({date: "desc"}).lean().then((postagens)=>{
+        
+        res.render("admin/postagens", {postagens:postagens})
+    }).catch((erro)=>{
+
+    })
 })
 
 router.get("/postagens/add", (req, res)=>{
@@ -110,7 +114,7 @@ router.get("/postagens/add", (req, res)=>{
         res.render("admin/addpostagens", {categorias: categorias})
     }).catch((erro)=>{
         
-    })  
+    })      
     
 })
 router.post("/postagens/nova", (req, res)=>{
@@ -141,5 +145,44 @@ router.post("/postagens/nova", (req, res)=>{
         })
     )
     
+})
+
+router.get("/postagens/deletar/:id", (req, res)=>{
+    Postagem.deleteOne({_id: req.params.id}).then((postagens)=>{
+        req.flash("success_msg", "Postagem deletada!")
+        res.redirect("/admin/postagens")
+    }).catch((erro)=>{
+        req.flash("error_msg", "Erro ao deletar postagem! Tente novamente.")
+    })
+})
+
+router.get("/postagens/edit/:id", (req, res)=>{
+    Postagem.findOne({_id: req.params.id}).lean().then((postagens)=>{
+
+        Categoria.find().lean().then((categorias)=>{
+            res.render("admin/editpostagens", {postagens: postagens, categorias: categorias})
+        }).catch((erro)=>{
+            
+        })
+    }).catch((erro)=>{
+
+    })
+})
+router.post("/postagens/edit", (req, res)=>{
+    Postagem.findOne({_id: req.body.id}).then((postagens)=>{
+
+        postagens.titulo = req.body.titulo
+        postagens.slug = req.body.slug
+        postagens.descricao =  req.body.descricao
+        postagens.categoria = req.body.categoria
+        postagens.conteudo = req.body.conteudo
+
+        postagens.save().then(()=>{
+            req.flash("success_msg", "Postagem  Editada")
+            res.redirect("/admin/postagens")
+        }).catch((erro)=>{
+            req.flash("error_msg", "Erro ao editar postagem")
+        })
+    })
 })
 module.exports = router

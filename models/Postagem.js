@@ -21,7 +21,7 @@ const postagem = new schema({
     categoria:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "categorias", 
-        //require: true
+        require: true
     },
     data:{
         type: Date,
