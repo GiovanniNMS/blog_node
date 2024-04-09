@@ -10,6 +10,8 @@ const session = require('express-session')
 const flash = require('connect-flash')
 require("./models/Postagem")
 const Postagem = mongoose.model("postagens")
+require("./models/Categoria")
+const Categoria = mongoose.model("categorias")
 
 //Conf 
 
@@ -63,7 +65,7 @@ app.get("/404", (req, res)=>{
 })
 
 app.get("/postagem/:slug", (req, res)=>{
-    Postagem.findOne({slug: req.params.slug}).then((postagem)=>{
+    Postagem.find({slug: req.params.slug}).populate("categoria").lean().then((postagem)=>{
         if(postagem){
             res.render("postagem/index", {postagem: postagem})
         }else{
@@ -73,6 +75,11 @@ app.get("/postagem/:slug", (req, res)=>{
     }).catch((erro)=>{
         req.flash("error_msg", "Erro ao carregar postagem! Tente novamente.")
         res.redirect("/")
+    })
+})
+app.get("/categorias", (req, res)=>{
+    Categoria.findOne().lean().then((categorias)=>{
+        res.render("postagem/categoria")
     })
 })
 //Outros
