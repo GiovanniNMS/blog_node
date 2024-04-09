@@ -61,9 +61,22 @@ app.get("/", (req, res)=>{
 app.get("/404", (req, res)=>{
     res.send("ERROR 404!")
 })
+
+app.get("/postagem/:slug", (req, res)=>{
+    Postagem.findOne({slug: req.params.slug}).then((postagem)=>{
+        if(postagem){
+            res.render("postagem/index", {postagem: postagem})
+        }else{
+            req.flash("error_msg", "Essa postagem não existe")
+            res.redirect("/")
+        }
+    }).catch((erro)=>{
+        req.flash("error_msg", "Erro ao carregar postagem! Tente novamente.")
+        res.redirect("/")
+    })
+})
 //Outros
 app.use("/admin", admin)
-
 
 
 const porta = 8081
