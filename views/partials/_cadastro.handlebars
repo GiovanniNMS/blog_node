@@ -1,0 +1,21 @@
+<script>
+    
+    window.onload = function () {
+        var cadastro = document.getElementById("cadastro")
+        if (cadastro) {
+            console.log(cadastro, )
+            document.getElementById("cadastro").style.display = "block"
+            
+        }else{
+            console.log(cadastro)
+             document.getElementById("cadastro").style.display = "none"
+        }
+    };
+
+</script>
+<div class="container-fluid py-5 cadastro" id="cadastro" >
+    <h1 class="display-5 fw-bold">Bem-Vindo ao Blog Node</h1>
+    <p class="col-md-8 fs-4">Crie sua conta para poder publicar seus postes e fazer parte da comunidade. E registrar
+        todo seu conhecimento na bolha DEV.</p>
+    <button class="btn btn-primary btn-lg" type="button">Cadastre-se</button>
+</div>

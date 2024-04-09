@@ -137,7 +137,7 @@ router.post("/postagens/nova", (req, res)=>{
         new Postagem(novaPoatagem).save().then(()=>{
         
             req.flash("success_msg","Postagem Cadastrada!")
-            res.redirect("/admin/postagens")
+            res.redirect("/")
         }).catch((erro)=>{
             req.flash("error_msg", "Erro ao cadastrar postagem! Tente Novamente")
             res.redirect("/admin/postagens/add")
