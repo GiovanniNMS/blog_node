@@ -23,7 +23,7 @@ app.use(session({
 app.use(flash())
 
 //Flash
-app.use((req, res, next)=>{
+app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg")
     res.locals.error_msg = req.flash("error_msg")
     next()
@@ -38,10 +38,10 @@ app.set('view engine', 'handlebars')
 
 //Mongoose
 mongoose.Promise = global.Promise
-mongoose.connect("mongodb://127.0.0.1:27017/node_bd").then(function() {
+mongoose.connect("mongodb://127.0.0.1:27017/node_bd").then(function () {
     console.log("MongoDB ok");
-}).catch(function(erro){
-    console.log("Erro ao conectar ao mongodb"+erro)
+}).catch(function (erro) {
+    console.log("Erro ao conectar ao mongodb" + erro)
 })
 
 //Public
@@ -51,37 +51,41 @@ app.use((req, res, next) => {
     next()
 })
 //Rotas
-app.get("/", (req, res)=>{
-    Postagem.find().populate("categoria").sort({date: "desc"}).lean().then((postagens)=>{
-        
-        res.render("index", {postagens:postagens})
-    }).catch((erro)=>{
-        req.flash("error_msg", "Ocorreu Erro Interno!")
-        res.redirect("/404")
-    })
+app.get("/", (req, res) => {
+    Postagem.find().sort({ data: "desc" }).populate("categoria").lean().then((postagens) => {
+
+        Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
+            res.render("index", {postagens: postagens, categorias: categorias})
+        }
+        )
+    }).catch((erro) => {
+    req.flash("error_msg", "Ocorreu Erro Interno!")
+    res.redirect("/404")
 })
-app.get("/404", (req, res)=>{
+})
+
+app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/postagem/:slug", (req, res)=>{
-    Postagem.find({slug: req.params.slug}).populate("categoria").lean().then((postagem)=>{
-        if(postagem){
-            res.render("postagem/index", {postagem: postagem})
-        }else{
+app.get("/postagem/:slug", (req, res) => {
+    Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {
+        if (postagem) {
+            res.render("postagem/index", { postagem: postagem })
+        } else {
             req.flash("error_msg", "Essa postagem não existe")
             res.redirect("/")
         }
-    }).catch((erro)=>{
+    }).catch((erro) => {
         req.flash("error_msg", "Erro ao carregar postagem! Tente novamente.")
         res.redirect("/")
     })
 })
-app.get("/categorias", (req, res)=>{
-    Categoria.findOne().lean().then((categorias)=>{
-        res.render("postagem/categoria")
-    })
+
+app.get("/filtrocategoria/:nome", (req, res)=>{
+    res.send("oi")
 })
+
 //Outros
 app.use("/admin", admin)
 
