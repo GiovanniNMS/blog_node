@@ -157,9 +157,9 @@ router.get("/postagens/deletar/:id", (req, res)=>{
 })
 
 router.get("/postagens/edit/:id", (req, res)=>{
-    Postagem.findOne({_id: req.params.id}).lean().then((postagens)=>{
+    Postagem.findOne({_id: req.params.id}).then((postagens)=>{
 
-        Categoria.find().lean().then((categorias)=>{
+        Categoria.find().then((categorias)=>{
             res.render("admin/editpostagens", {postagens: postagens, categorias: categorias})
         }).catch((erro)=>{
             

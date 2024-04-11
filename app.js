@@ -82,8 +82,21 @@ app.get("/postagem/:slug", (req, res) => {
     })
 })
 
-app.get("/filtrocategoria/:nome", (req, res)=>{
-    res.send("oi")
+app.get("/filtrocategoria/:slug", (req, res)=>{
+    const cat =  req.params.slug
+    console.log(cat)
+    Categoria.findOne({slug: req.params.slug}).lean().then((categoria)=>{
+        if (categoria) {
+            Postagem.find({categoria: categoria._id}).populate("categoria").lean().then((postagens)=>{
+                res.render("postagem/porcategoria", {postagens: postagens, categoria: categoria})
+            })
+        } else {
+            req.flash("error_msg", "Categoria inexistente!")
+            res.redirect("/")
+        }
+    }).catch((erro)=>{
+        console.log(erro)
+    })
 })
 
 //Outros
