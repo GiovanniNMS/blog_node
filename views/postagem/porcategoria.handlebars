@@ -1,35 +1,39 @@
-
 <h2>Postagens: </h2>
+
 <hr>
 <a href="/admin/postagens/add"><button class="btn btn-success">Nova Postagem</button></a>
 <li class="dropdown btn btn-secondary">
-          <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Filtrar Por Categoria:
-          </a>
-          <ul class="dropdown-menu">
-            {{#each categoria}}
-            <li><a class="dropdown-item" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
-            {{/each}}
-          </ul>
-        </li>
+  <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Filtrar Por Categoria:
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/">Todos</a></li>
+    <hr>
+    {{#each categorias}}
+    <li><a class="dropdown-item" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
+    {{/each}}
 
+  </ul>
+</li>
+<h4 class="mt-4">{{categoria.nome}}</h4>
 
 
 {{#each postagens}}
-<div class="card mt-4">
-    <div class="card-body">
-        <H4>Titulo: {{titulo}}</H4>
-        <small><strong>Descrição:</strong> {{descricao}}</small>
-        <br>
-        <small><strong>Categoria:</strong> {{categoria.nome}}</small>
-        <br>
-        <a href="/postagem/{{slug}}"><button type="button" class="btn btn-secondary mt-2">Ler Mais</button></a>
-        <hr>
-        <small>Data de publicação: {{data}}</small>
-        <br>
-    </div>
-</div>
 
-{{else}}
-<p>Postagens vazia!</p>
+<div class="card mt-4">
+  <div class="card-body">
+
+    <H4>Titulo: {{titulo}}</H4>
+    <small><strong>Descrição:</strong> {{descricao}}</small>
+    <br>
+    <small><strong>Categoria:</strong> {{categoria.nome}}</small>
+    <br>
+    <a href="/postagem/{{slug}}"><button type="button" class="btn btn-secondary mt-2">Ler Mais</button></a>
+    <hr>
+    <small>Data de publicação: {{data}}</small>
+    <br>
+  </div>
+</div>
+ {{else}}
+    <p>Postagens vazia!</p>
 {{/each}}

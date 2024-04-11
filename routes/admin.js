@@ -148,7 +148,7 @@ router.post("/postagens/nova", (req, res)=>{
 })
 
 router.get("/postagens/deletar/:id", (req, res)=>{
-    Postagem.deleteOne({_id: req.params.id}).then((postagens)=>{
+    Postagem.deleteOne({_id: req.params.id}).then(()=>{
         req.flash("success_msg", "Postagem deletada!")
         res.redirect("/admin/postagens")
     }).catch((erro)=>{
