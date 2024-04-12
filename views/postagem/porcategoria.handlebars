@@ -10,12 +10,12 @@
     <li><a class="dropdown-item" href="/">Todos</a></li>
     <hr>
     {{#each categorias}}
-    <li><a class="dropdown-item" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
+    <li><a class="dropdown-item text-capitalize" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
     {{/each}}
 
   </ul>
 </li>
-<h4 class="mt-4">{{categoria.nome}}</h4>
+<h4 class="mt-4 text-capitalize">{{categoria.nome}}</h4>
 
 
 {{#each postagens}}

@@ -12,6 +12,7 @@ require("./models/Postagem")
 const Postagem = mongoose.model("postagens")
 require("./models/Categoria")
 const Categoria = mongoose.model("categorias")
+const usuario = require("./routes/usuario")
 
 //Conf 
 
@@ -87,14 +88,22 @@ app.get("/filtrocategoria/:slug", (req, res)=>{
     Categoria.findOne({slug: req.params.slug}).lean().then((categoria)=>{
         if (categoria) {
             Postagem.find({categoria: categoria._id}).populate("categoria").lean().then((postagens)=>{
+       
                 
 
+                if(!postagens){
+                    
+                    res.render("postagem/porcategoria", {categria: categoria})
+                    console.log("segundo")
+                }else{
+                    console.log(verfPostagens)
                     Categoria.find().lean().then((categorias)=>{
                         console.log("primeiro")
                         res.render("postagem/porcategoria", {postagens: postagens, categoria: categoria, categorias, categorias})
                     }).catch((erro)=>{
                         res.render("postagem/porcategoria", {categoria: categoria})
                     })
+                }
             })
         } else {
             req.flash("error_msg", "Categoria inexistente!")
@@ -107,6 +116,7 @@ app.get("/filtrocategoria/:slug", (req, res)=>{
 
 //Outros
 app.use("/admin", admin)
+app.use("/usuario", usuario)
 
 
 const porta = 8081
