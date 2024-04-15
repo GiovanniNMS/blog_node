@@ -5,6 +5,8 @@ require("../models/Categoria")
 require("../models/Postagem")
 const Postagem = mongoose.model("postagens")
 const Categoria = mongoose.model("categorias")
+const {eAdmin} = require("../helpers/eAdmin")
+
 
 router.get('/', (req, res)=>{
     res.render("admin/index")
@@ -23,10 +25,10 @@ router.get('/categorias', (req, res)=>{
         res.redirect("/admin")
     })
 })
-router.get("/categorias/add", (req, res)=>{
+router.get("/categorias/add", eAdmin, (req, res)=>{
     res.render("admin/addcategorias")
 })
-router.post('/categorias/nova', (req, res)=>{
+router.post('/categorias/nova', eAdmin, (req, res)=>{
 
     const erros = []
     if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
@@ -59,7 +61,7 @@ router.post('/categorias/nova', (req, res)=>{
 
     
 })
-router.get("/categorias/edit/:id", (req, res)=>{
+router.get("/categorias/edit/:id", eAdmin, (req, res)=>{
     Categoria.findOne({_id: req.params.id}).lean().then((categorias)=>{
         res.render("admin/editcategorias", {categorias: categorias})
     }).catch((erro)=>{
@@ -69,7 +71,7 @@ router.get("/categorias/edit/:id", (req, res)=>{
     
 })
 
-router.post("/categorias/edit", (req, res)=>{
+router.post("/categorias/edit", eAdmin, (req, res)=>{
     
      Categoria.findOne({_id: req.body.id}).then((categorias)=>{
 
@@ -90,7 +92,7 @@ router.post("/categorias/edit", (req, res)=>{
      })
 })
 
-router.get("/categorias/deletar/:id", (req, res)=>{
+router.get("/categorias/deletar/:id", eAdmin, (req, res)=>{
     Categoria.deleteOne({_id: req.params.id}).then(()=>{
         req.flash("success_msg", "Categoria " + req.body.nome + " deletada!")
         res.redirect("/admin/categorias")
