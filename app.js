@@ -1,5 +1,5 @@
 //Carregando modulos
-const mongoose = require("mongoose")
+const mongoose = require('mongoose')
 const express = require('express')
 const app = express()
 const handlebars = require('express-handlebars')
@@ -39,7 +39,7 @@ app.set('view engine', 'handlebars')
 
 //Mongoose
 mongoose.Promise = global.Promise
-mongoose.connect("mongodb://127.0.0.1:27017/node_bd").then(function () {
+mongoose.connect("mongodb://0.0.0.0/node_bd").then(function () {
     console.log("MongoDB ok");
 }).catch(function (erro) {
     console.log("Erro ao conectar ao mongodb" + erro)

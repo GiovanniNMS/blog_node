@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const schema = mongoose.Schema
 
+
 const usuario =new schema({
     nome:{
         type: String,
@@ -9,6 +10,10 @@ const usuario =new schema({
     email:{
         type: String,
         require: true
+    },
+    eAdmin:{
+        type: Number,
+        default: 0
     },
     senha:{
         type: String,
