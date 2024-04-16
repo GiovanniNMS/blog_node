@@ -12,7 +12,12 @@
     };
 </script>
 
-<div class="container-fluid card py-1 cadastro" id="cadastro">
+{{#if user}}
+    
+
+
+{{else}}
+    <div class="container-fluid card py-1 cadastro" id="cadastro">
     <div class="card-body">
         <h1 class="display-5 fw-bold">Bem-Vindo ao Blog Node</h1>
         <p class="col-md-8 fs-4">Crie sua conta para poder publicar seus postagens e fazer parte da comunidade. E
@@ -21,7 +26,6 @@
         <a href="/usuario/login"> <button class="btn btn-success btn-lg">Login</button></a>
         <a href="/usuario/registro"><button class="btn btn-primary btn-lg" type="button"
                 onclick="">Cadastre-se</button></a>
-        
     </div>
-
-</div>
+    </div>
+{{/if}}

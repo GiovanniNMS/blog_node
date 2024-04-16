@@ -26,16 +26,21 @@ module.exports = function(passport) {
       })
     }))
 
-    passport.serializeUser((usuario, done)=>{
-      done(null, usuario._id)
-    })
-    passport.deserializeUser((id, done)=>{
-      Usuario.findById(id).lean().then((erro, usuario)=>{
-        done(null, usuario)
-      }).catch((erro)=>{
-        done(null, false, {menssagem: "Algo deu errado"})
-      })
-    })
+    passport.serializeUser(function(usuario,done) {
+      process.nextTick(function() {
+        return done(null, {
+          id: usuario.id,
+          email: usuario.email,
+          
+        });
+      });
+    });
+    
+    passport.deserializeUser(function(usuario, done) {
+      process.nextTick(function() {
+        return done(null, usuario);
+      });
+    });
 }
 
 

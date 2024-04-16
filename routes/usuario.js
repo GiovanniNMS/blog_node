@@ -71,12 +71,10 @@ router.post("/registro/novo", (req, res)=>{
     }
 })
 
-router.post("/login", (req, res, next)=>{
-    passport.authenticate("local",{
-        successRedirect: "/", 
-        failureRedirect:"/usuario/login",
-        failureFlash: true
-    })(req, res, next)
+router.post("/login",
+    passport.authenticate('local', { failureRedirect: '/usuario/login', failureMessage: true }),
+  function(req, res) {
+    res.redirect('/');
 })
 
 module.exports =  router

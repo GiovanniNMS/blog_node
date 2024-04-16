@@ -1,10 +1,10 @@
-
 module.exports = {
-    eAdmin: function(req, res, next){
-        if(req.isAuthenticated() && req.user.eAdmin == 1){
-            return next
+    eAdmin: function(req, res, next) {
+        if (req.isAuthenticated())  {
+            return next();
+        } else {
+            req.flash("error_msg", "Acesso restrito!");
+            res.redirect("/");
         }
-        req.flash("error_msg", "Acesso restrito para Admin!")
-        res.redirect("/")
     }
-}
+};

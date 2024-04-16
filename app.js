@@ -14,28 +14,33 @@ require("./models/Categoria")
 const Categoria = mongoose.model("categorias")
 const usuario = require("./routes/usuario")
 const passport = require('passport')
-require('./config/auth.js')(passport)
+require('./config/auth.js')(passport)   
+const {eAdmin} = require("./helpers/eAdmin")
 //Conf 
 
 //sessões
 app.use(session({
-    secret: "secretSegura",
-    resave: true,
-    saveUninitialized: true
-}))
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    //cookie: { secure: true }
+  }));
+ 
 //Passport
-app.use(passport.initialize())
+//app.use(passport.initialize())
 app.use(passport.session())
 
 
 //Flash
 app.use(flash())
 app.use((req, res, next) => {
-    res.locals.success_msg = req.flash("success_msg")
-    res.locals.error_msg = req.flash("error_msg")
-    res.locals.error = req.flash("error")
+    res.locals.success_msg = req.flash("success_msg");
+    res.locals.error_msg = req.flash("error_msg");
+    res.locals.error = req.flash("error");
     res.locals.user = req.user || null;
-    next()
+    res.locals.eAdmin = req.eAdmin || null;
+    next();
+    
 })
 //bory-parser
 app.use(bodyoparser.urlencoded({ extended: true }))
@@ -77,7 +82,7 @@ app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/postagem/:slug", (req, res) => {
+app.get("/postagem/:slug", eAdmin, (req, res) => {
     Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {
         if (postagem) {
             res.render("postagem/index", { postagem: postagem })
