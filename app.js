@@ -15,7 +15,7 @@ const Categoria = mongoose.model("categorias")
 const usuario = require("./routes/usuario")
 const passport = require('passport')
 require('./config/auth.js')(passport)   
-const {eAdmin} = require("./helpers/eAdmin")
+const { isAdmin } = require("./helpers/isAdmin.js")
 //Conf 
 
 //sessões
@@ -27,7 +27,7 @@ app.use(session({
   }));
  
 //Passport
-//app.use(passport.initialize())
+app.use(passport.initialize())
 app.use(passport.session())
 
 
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
     res.locals.error_msg = req.flash("error_msg");
     res.locals.error = req.flash("error");
     res.locals.user = req.user || null;
-    res.locals.eAdmin = req.eAdmin || null;
+    res.locals.eAdmin = req.isAdmin || null;
     next();
     
 })
@@ -66,12 +66,12 @@ app.use((req, res, next) => {
 })
 //Rotas
 app.get("/", (req, res) => {
+    
     Postagem.find().sort({ data: "desc" }).populate("categoria").lean().then((postagens) => {
-
         Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
+            
             res.render("index", {postagens: postagens, categorias: categorias})
-        }
-        )
+        })
     }).catch((erro) => {
     req.flash("error_msg", "Ocorreu Erro Interno!")
     res.redirect("/404")
@@ -82,7 +82,7 @@ app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/postagem/:slug", eAdmin, (req, res) => {
+app.get("/postagem/:slug", isAdmin, (req, res) => {
     Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {
         if (postagem) {
             res.render("postagem/index", { postagem: postagem })
@@ -109,7 +109,6 @@ app.get("/filtrocategoria/:slug", (req, res)=>{
                     res.render("postagem/porcategoria", {categria: categoria})
                     console.log("segundo")
                 }else{
-                    console.log(verfPostagens)
                     Categoria.find().lean().then((categorias)=>{
                         console.log("primeiro")
                         res.render("postagem/porcategoria", {postagens: postagens, categoria: categoria, categorias, categorias})

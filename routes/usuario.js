@@ -39,7 +39,7 @@ router.post("/registro/novo", (req, res)=>{
         Usuario.findOne({email: req.body.email}).lean().then((usuario) =>{
             if (usuario) {
                 console.log("email ja cadastrado")
-                req.flash("error_msg", "Email já cadastrado!")
+                req.flash("error_msg", "Email já cadastrado! Faça o login.")
                 res.redirect("/usuario/registro")
             }else{
                 const novoUsuario = new Usuario({
@@ -72,9 +72,23 @@ router.post("/registro/novo", (req, res)=>{
 })
 
 router.post("/login",
-    passport.authenticate('local', { failureRedirect: '/usuario/login', failureMessage: true }),
-  function(req, res) {
+    passport.authenticate('local', 
+    { successFlash: "/", 
+    failureRedirect: '/usuario/login', 
+    failureMessage: true, 
+    failureFlash:true}),
+  function(req, res, next) {
     res.redirect('/');
 })
 
+router.get("/logout", (req, res)=>{
+    req.logout(function(err){
+        if(err){
+            return next(err)
+        }
+        req.flash("success_msg", "Deslogado!")
+        res.redirect("/")
+    })
+    
+})
 module.exports =  router

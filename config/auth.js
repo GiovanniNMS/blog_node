@@ -10,15 +10,15 @@ module.exports = function(passport) {
     passport.use(new localStrategy({usernameField: 'email', passwordField: "senha"}, (email, senha, done)=>{
       Usuario.findOne({email: email}).lean().then((usuario)=>{
         if (!usuario) {
-          console.log("emaiç")
-          return done(null, null, {message: "Dados inválidos! Tente novamente.."})
+          console.log("email")
+          return done(null, false, {message: "Dados inválidos! Tente novamente."})
         }
         bcryptjs.compare(senha, usuario.senha, (erro, batem)=>{
           if (batem) {
-            console.log("foi")
+            console.log("Batem Usuario")
             return done(null, usuario)
           } else {
-            console.log("foi aui")
+            console.log("nao bateu usuario")
             return done(null, false, {message: "Dados inválidos! Tente novamente."})
             
           }
@@ -26,20 +26,21 @@ module.exports = function(passport) {
       })
     }))
 
-    passport.serializeUser(function(usuario,done) {
-      process.nextTick(function() {
+    passport.serializeUser((usuario,done)=> {
+
+      /*process.nextTick(function() {
         return done(null, {
-          id: usuario.id,
-          email: usuario.email,
-          
+          id: usuario.id
         });
-      });
+      });*/
+
+      done(null, usuario._id)
     });
     
-    passport.deserializeUser(function(usuario, done) {
-      process.nextTick(function() {
-        return done(null, usuario);
-      });
+    passport.deserializeUser((id, done)=> {
+      Usuario.findOne({_id: id}).then((usuario)=>{
+        done(null, usuario)
+      })
     });
 }
 

@@ -1,35 +1,66 @@
+<script>
+  window.onload = function () {
+    document.getElementById('close').onclick = function () {
+      this.parentNode.parentNode.remove()
+      return false;
+    };
+
+
+  };
+</script>
+
+{{#if user}}
+
+
+
+{{else}}
+<div class="container-fluid card py-1 cadastro" id="cadastro">
+  <div class="card-body" id="cadastro">
+    <button type="button" class="btn-close position-absolute top-0 end-0 me-4 mt-4" id="close"
+      onclick="this.parentNode.remove(); return false;" aria-label="Close"></button>
+    <h1 class="display-5 fw-bold">Bem-Vindo ao Blog Node</h1>
+    <p class="col-md-8 fs-4">Crie sua conta para poder publicar seus postagens e fazer parte da comunidade. E
+      compartilhar
+      todo seu conhecimento na bolha DEV.</p>
+    <a href="/usuario/login"> <button class="btn btn-success btn-lg">Login</button></a>
+    <a href="/usuario/registro"><button class="btn btn-primary btn-lg" type="button" onclick="">Cadastre-se</button></a>
+  </div>
+</div>
+{{/if}}
 
 <h2>Postagens: </h2>
 <hr>
 <a href="/admin/postagens/add"><button class="btn btn-success">Nova Postagem</button></a>
 <li class="dropdown btn btn-secondary">
-          <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Filtrar Por Categoria:
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/">Todos</a></li>
-            <hr>
-            {{#each categorias}}
-            <li><a class="dropdown-item text-capitalize" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
-            {{/each}}
-          </ul>
-        </li>
+  <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Filtrar Por Categoria:
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/">Todos</a></li>
+    <hr>
 
+    {{#each categorias}}
+    <li><a class="dropdown-item text-capitalize" href="/filtrocategoria/{{slug}}">{{nome}}</a></li>
+    {{/each}}
+  </ul>
+</li>
 
-
+{{#if usuarioLogado}}
+<label for="">{{usuarioLog}}</label>
+{{/if}}
 {{#each postagens}}
 <div class="card mt-4">
-    <div class="card-body">
-        <H4 class="text-capitalize">Titulo: {{titulo}}</H4>
-        <small class=""><strong>Descrição:</strong> {{descricao}}</small>
-        <br>
-        <small class="text-capitalize"><strong>Categoria:</strong> {{categoria.nome}}</small>
-        <br>
-        <a href="/postagem/{{slug}}"><button type="button" class="btn btn-secondary mt-2">Ler Mais</button></a>
-        <hr>
-        <small>Data de publicação: {{data}}</small>
-        <br>
-    </div>
+  <div class="card-body">
+    <H4 class="text-capitalize">Titulo: {{titulo}}</H4>
+    <small class=""><strong>Descrição:</strong> {{descricao}}</small>
+    <br>
+    <small class="text-capitalize"><strong>Categoria:</strong> {{categoria.nome}}</small>
+    <br>
+    <a href="/postagem/{{slug}}"><button type="button" class="btn btn-secondary mt-2">Ler Mais</button></a>
+    <hr>
+    <small>Data de publicação: {{data}}</small>
+    <br>
+  </div>
 </div>
 
 {{else}}
