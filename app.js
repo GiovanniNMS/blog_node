@@ -54,7 +54,7 @@ app.set('view engine', 'handlebars')
 
 //Mongoose
 mongoose.Promise = global.Promise
-mongoose.connect("mongodb+srv://ydagalera123:YoWPVAvDfsG078Tm@cluster0.ry1bgmf.mongodb.net/node_bd").then(function () {
+mongoose.connect("mongodb+srv://jovincu123:sopaio123@cluster0.70vnaw0.mongodb.net/node_bd").then(function () {
     console.log("MongoDB ok");
 }).catch(function (erro) {
     console.log("Erro ao conectar ao mongodb" + erro)
@@ -128,7 +128,7 @@ app.use("/admin", admin)
 app.use("/usuario", usuario)
 
 
-const porta = process.env.PORT
+const porta = process.env.PORT || 8081
 app.listen(porta, () => {
     console.log('Servidor ok!')
 })
