@@ -8,15 +8,17 @@
 
     <div class="collapse navbar-collapse " id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
-        {{#if user}}
+        {{#if eAdmin}}
         <li class="dropdown">
           <a class="nav-link dropdown-toggle active " href="#" role="button" data-bs-toggle="dropdown"
             aria-expanded="false">
-            Editar
+            ADM
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item text-capitalize" href="/admin/postagens">Postagens</a></li>
             <li><a href="/admin/categorias" class="dropdown-item text-capitalze">Categorias</a></li>
+            <hr>
+            <li><a href="/admin/addAdmin" class="dropdown-item text-capitalize">Cadastrar Adm</a></li>
           </ul>
         </li>
         {{/if}}

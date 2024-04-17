@@ -45,13 +45,10 @@
   </ul>
 </li>
 
-{{#if usuarioLogado}}
-<label for="">{{usuarioLog}}</label>
-{{/if}}
 {{#each postagens}}
 <div class="card mt-4">
   <div class="card-body">
-    <H4 class="text-capitalize">Titulo: {{titulo}}</H4>
+    <H4 class="text-capitalize"> {{titulo}}</H4>
     <small class=""><strong>Descrição:</strong> {{descricao}}</small>
     <br>
     <small class="text-capitalize"><strong>Categoria:</strong> {{categoria.nome}}</small>

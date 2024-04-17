@@ -5,8 +5,8 @@ require("../models/Categoria")
 require("../models/Postagem")
 const Postagem = mongoose.model("postagens")
 const Categoria = mongoose.model("categorias")
-const {isAdmin} = require("../helpers/isAdmin")
-
+const{eAdmin} = require('../helpers/eAdmin.js')
+const {logado} = require("../helpers/logado.js")
 
 router.get('/', (req, res)=>{
     res.render("admin/index")
@@ -17,7 +17,7 @@ router.get('/posts', (req,res)=>{
     res.send("admin dos posts")
 })
 
-router.get('/categorias', (req, res)=>{
+router.get('/categorias', eAdmin, (req, res)=>{
     Categoria.find().sort({date: 'desc'}).lean().then((categorias)=>{
         res.render("admin/categorias", {categorias: categorias})
     }).catch((erro)=>{
@@ -25,10 +25,10 @@ router.get('/categorias', (req, res)=>{
         res.redirect("/admin")
     })
 })
-router.get("/categorias/add", isAdmin, (req, res)=>{
+router.get("/categorias/add", eAdmin, (req, res)=>{
     res.render("admin/addcategorias")
 })
-router.post('/categorias/nova', isAdmin, (req, res)=>{
+router.post('/categorias/nova', eAdmin, (req, res)=>{
 
     const erros = []
     if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
@@ -61,7 +61,7 @@ router.post('/categorias/nova', isAdmin, (req, res)=>{
 
     
 })
-router.get("/categorias/edit/:id", isAdmin, (req, res)=>{
+router.get("/categorias/edit/:id", eAdmin, (req, res)=>{
     Categoria.findOne({_id: req.params.id}).lean().then((categorias)=>{
         res.render("admin/editcategorias", {categorias: categorias})
     }).catch((erro)=>{
@@ -71,7 +71,7 @@ router.get("/categorias/edit/:id", isAdmin, (req, res)=>{
     
 })
 
-router.post("/categorias/edit", isAdmin, (req, res)=>{
+router.post("/categorias/edit", eAdmin, (req, res)=>{
     
      Categoria.findOne({_id: req.body.id}).then((categorias)=>{
 
@@ -92,7 +92,7 @@ router.post("/categorias/edit", isAdmin, (req, res)=>{
      })
 })
 
-router.get("/categorias/deletar/:id", isAdmin, (req, res)=>{
+router.get("/categorias/deletar/:id", eAdmin, (req, res)=>{
     Categoria.deleteOne({_id: req.params.id}).then(()=>{
         req.flash("success_msg", "Categoria " + req.body.nome + " deletada!")
         res.redirect("/admin/categorias")
@@ -102,16 +102,15 @@ router.get("/categorias/deletar/:id", isAdmin, (req, res)=>{
     })
 })
 
-router.get("/postagens", (req, res)=>{
+router.get("/postagens", logado, (req, res)=>{
     Postagem.find().populate("categoria").sort({date: "desc"}).lean().then((postagens)=>{
-        
         res.render("admin/postagens", {postagens:postagens})
     }).catch((erro)=>{
 
     })
 })
 
-router.get("/postagens/add", isAdmin, (req, res)=>{
+router.get("/postagens/add", logado ,(req, res)=>{
     Categoria.find().lean().then((categorias)=>{
         res.render("admin/addpostagens", {categorias: categorias})
     }).catch((erro)=>{
@@ -119,7 +118,7 @@ router.get("/postagens/add", isAdmin, (req, res)=>{
     })      
     
 })
-router.post("/postagens/nova", isAdmin, (req, res)=>{
+router.post("/postagens/nova", logado, (req, res)=>{
     const novaPoatagem = {
         titulo: req.body.titulo, 
         slug: req.body.slug,
@@ -149,7 +148,7 @@ router.post("/postagens/nova", isAdmin, (req, res)=>{
     
 })
 
-router.get("/postagens/deletar/:id", isAdmin, (req, res)=>{
+router.get("/postagens/deletar/:id", logado, (req, res)=>{
     Postagem.deleteOne({_id: req.params.id}).then(()=>{
         req.flash("success_msg", "Postagem deletada!")
         res.redirect("/admin/postagens")
@@ -158,10 +157,10 @@ router.get("/postagens/deletar/:id", isAdmin, (req, res)=>{
     })
 })
 
-router.get("/postagens/edit/:id", isAdmin,(req, res)=>{
-    Postagem.findOne({_id: req.params.id}).then((postagens)=>{
+router.get("/postagens/edit/:id", logado,(req, res)=>{
+    Postagem.findOne({_id: req.params.id}).lean().then((postagens)=>{
 
-        Categoria.find().then((categorias)=>{
+        Categoria.find().lean().then((categorias)=>{
             res.render("admin/editpostagens", {postagens: postagens, categorias: categorias})
         }).catch((erro)=>{
             
@@ -170,7 +169,7 @@ router.get("/postagens/edit/:id", isAdmin,(req, res)=>{
 
     })
 })
-router.post("/postagens/edit", isAdmin, (req, res)=>{
+router.post("/postagens/edit", logado, (req, res)=>{
     Postagem.findOne({_id: req.body.id}).then((postagens)=>{
 
         postagens.titulo = req.body.titulo
@@ -186,5 +185,9 @@ router.post("/postagens/edit", isAdmin, (req, res)=>{
             req.flash("error_msg", "Erro ao editar postagem")
         })
     })
+})
+
+router.get("/addAdmin", eAdmin, (req, res)=>{
+    res.render("admin/addAdmin")
 })
 module.exports = router

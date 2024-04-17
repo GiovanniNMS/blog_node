@@ -9,13 +9,11 @@ const Usuario = mongoose.model("usuarios")
 module.exports = function(passport) {
     passport.use(new localStrategy({usernameField: 'email', passwordField: "senha"}, (email, senha, done)=>{
       Usuario.findOne({email: email}).lean().then((usuario)=>{
-        if (!usuario) {
-          console.log("email")
+        if (!usuario || typeof usuario == undefined || usuario == null) {
           return done(null, false, {message: "Dados inválidos! Tente novamente."})
         }
         bcryptjs.compare(senha, usuario.senha, (erro, batem)=>{
           if (batem) {
-            console.log("Batem Usuario")
             return done(null, usuario)
           } else {
             console.log("nao bateu usuario")
@@ -27,13 +25,6 @@ module.exports = function(passport) {
     }))
 
     passport.serializeUser((usuario,done)=> {
-
-      /*process.nextTick(function() {
-        return done(null, {
-          id: usuario.id
-        });
-      });*/
-
       done(null, usuario._id)
     });
     

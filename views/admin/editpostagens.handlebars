@@ -7,15 +7,15 @@
         <form action="/admin/postagens/edit" method="post">
             <input type="hidden" name="id" value="{{postagens._id}}">
             <label for="titulo" class="mt-2" >Titulo:</label>
-            <input type="text" name="titulo"  class="form-control" value="{{postagens.titulo}}">
+            <input type="text" name="titulo"  class="form-control" value="{{postagens.titulo}}" required>
             <label for="slug" class="mt-2">Slug:</label>
-            <input type="text" name="slug" id="slug" class="form-control" value="{{postagens.slug}}" >
+            <input type="text" name="slug" id="slug" class="form-control" value="{{postagens.slug}}" required>
             <label for="descricao" class="mt-2">Descrição:</label>
-            <input type="text" name="descricao" id="descricao" class="form-control" value="{{postagens.descricao}}">
+            <input type="text" name="descricao" id="descricao" class="form-control" value="{{postagens.descricao}}" required>
             <label for="conteudo" class="mt-2">Conteudo:</label>
-            <textarea name="conteudo" id="conteudo" class="form-control" >{{postagens.conteudo}}</textarea>
+            <textarea name="conteudo" id="conteudo" class="form-control" required>{{postagens.conteudo}}</textarea>
             <label for="categoria" class="mt-2">Categoria:</label>
-            <select name="categoria" class="form-select" id="categoria">
+            <select name="categoria" class="form-select" id="categoria" required>
                 {{#each categorias}}
                     <option value="{{_id}}">{{nome}}</option>
                 {{else}}

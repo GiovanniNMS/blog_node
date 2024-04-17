@@ -12,5 +12,16 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "save": "^2.9.0"
-  }
+  },
+  "name": "blog_node",
+  "version": "1.0.0",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+"start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

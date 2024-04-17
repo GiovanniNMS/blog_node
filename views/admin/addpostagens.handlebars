@@ -7,15 +7,15 @@
         <h3>Cadastrar Postagem</h3>
         <form action="/admin/postagens/nova" method="post">
             <label for="titulo" class="mt-2">Titulo:</label>
-            <input type="text" name="titulo" id="" class="form-control">
+            <input type="text" name="titulo" id="" class="form-control" required>
             <label for="slug" class="mt-2">Slug:</label>
-            <input type="text" name="slug" id="" class="form-control">
+            <input type="text" name="slug" id="" class="form-control" required>
             <label for="descricao" class="mt-2">Descrição:</label>
-            <input type="text" name="descricao" id="" class="form-control">
+            <input type="text" name="descricao" id="" class="form-control" required>
             <label for="conteudo" class="mt-2">Conteudo:</label>
-            <textarea name="conteudo" id="" class="form-control"></textarea>
+            <textarea name="conteudo" id="" class="form-control" required></textarea>
             <label for="categoria" class="mt-2">Categoria:</label>
-            <select name="categoria" class="form-select">
+            <select name="categoria" class="form-select" required>
                 {{#each categorias}}
                     <option value="{{_id}}">{{nome}}</option>
                 {{else}}

@@ -14,8 +14,9 @@ require("./models/Categoria")
 const Categoria = mongoose.model("categorias")
 const usuario = require("./routes/usuario")
 const passport = require('passport')
-require('./config/auth.js')(passport)   
-const { isAdmin } = require("./helpers/isAdmin.js")
+require('./config/auth.js')(passport)
+const {logado} = require("./helpers/logado.js")
+
 //Conf 
 
 //sessões
@@ -37,8 +38,9 @@ app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg");
     res.locals.error_msg = req.flash("error_msg");
     res.locals.error = req.flash("error");
-    res.locals.user = req.user || null;
-    res.locals.eAdmin = req.isAdmin || null;
+    res.locals.user = req.user;
+    res.locals.eAdmin = req.user && req.user.eAdmin;
+    res.locals.logado = req.logado;
     next();
     
 })
@@ -66,23 +68,22 @@ app.use((req, res, next) => {
 })
 //Rotas
 app.get("/", (req, res) => {
-    
+//console.log(req.user); 
     Postagem.find().sort({ data: "desc" }).populate("categoria").lean().then((postagens) => {
         Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
-            
-            res.render("index", {postagens: postagens, categorias: categorias})
-        })
+            res.render("index", { postagens: postagens, categorias: categorias, eAdmin: req.user && req.user.eAdmin });
+        });
     }).catch((erro) => {
-    req.flash("error_msg", "Ocorreu Erro Interno!")
-    res.redirect("/404")
-})
-})
+        req.flash("error_msg", "Ocorreu um erro interno!");
+        res.redirect("/404");
+    });
+});
 
 app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/postagem/:slug", isAdmin, (req, res) => {
+app.get("/postagem/:slug", logado, (req, res) => {
     Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {
         if (postagem) {
             res.render("postagem/index", { postagem: postagem })
@@ -101,11 +102,7 @@ app.get("/filtrocategoria/:slug", (req, res)=>{
     Categoria.findOne({slug: req.params.slug}).lean().then((categoria)=>{
         if (categoria) {
             Postagem.find({categoria: categoria._id}).populate("categoria").lean().then((postagens)=>{
-       
-                
-
                 if(!postagens){
-                    
                     res.render("postagem/porcategoria", {categria: categoria})
                     console.log("segundo")
                 }else{
@@ -131,7 +128,7 @@ app.use("/admin", admin)
 app.use("/usuario", usuario)
 
 
-const porta = 8081
+const porta = process.env.PORT || 8089
 app.listen(porta, () => {
     console.log('Servidor ok!')
 })
