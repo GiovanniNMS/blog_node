@@ -54,7 +54,7 @@ app.set('view engine', 'handlebars')
 
 //Mongoose
 mongoose.Promise = global.Promise
-mongoose.connect("mongodb://0.0.0.0/node_bd").then(function () {
+mongoose.connect("mongodb+srv://ydagalera123:YoWPVAvDfsG078Tm@cluster0.ry1bgmf.mongodb.net/node_bd").then(function () {
     console.log("MongoDB ok");
 }).catch(function (erro) {
     console.log("Erro ao conectar ao mongodb" + erro)
