@@ -128,7 +128,7 @@ app.use("/admin", admin)
 app.use("/usuario", usuario)
 
 
-const porta = process.env.PORT || 8089
+const porta = process.env.PORT
 app.listen(porta, () => {
     console.log('Servidor ok!')
 })
