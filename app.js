@@ -128,7 +128,12 @@ app.use("/admin", admin)
 app.use("/usuario", usuario)
 
 
-const porta = process.env.PORT || 8081
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`Servidor Node.js rodando em http://${HOST}:${PORT}`);
+});
 app.listen(porta, () => {
     console.log('Servidor ok!')
 })
