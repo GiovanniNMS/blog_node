@@ -134,6 +134,3 @@ const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   console.log(`Servidor Node.js rodando em http://${HOST}:${PORT}`);
 });
-app.listen(porta, () => {
-    console.log('Servidor ok!')
-})
