@@ -2,6 +2,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "bootstrap-icons": "^1.11.3",
     "connect-flash": "^0.1.1",
     "express": "^4.19.2",
     "express-handlebars": "^7.1.2",
@@ -16,10 +17,9 @@
   "name": "blog_node",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-"start": "node app.js"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
