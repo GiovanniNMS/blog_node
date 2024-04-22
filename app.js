@@ -15,7 +15,10 @@ const Categoria = mongoose.model("categorias")
 const usuario = require("./routes/usuario")
 const passport = require('passport')
 require('./config/auth.js')(passport)
-const {logado} = require("./helpers/logado.js")
+const { logado } = require("./helpers/logado.js")
+const { isUsuario } = require('./helpers/isUsuario.js')
+require("./models/Usuario.js")
+const Usuario = mongoose.model("usuarios")
 
 //Conf 
 
@@ -25,8 +28,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     //cookie: { secure: true }
-  }));
- 
+}));
+
 //Passport
 app.use(passport.initialize())
 app.use(passport.session())
@@ -39,10 +42,12 @@ app.use((req, res, next) => {
     res.locals.error_msg = req.flash("error_msg");
     res.locals.error = req.flash("error");
     res.locals.user = req.user;
+    res.locals.userid = req.user ? req.user._id : null;
     res.locals.eAdmin = req.user && req.user.eAdmin;
     res.locals.logado = req.logado;
+    res.locals.isUsuario = req.user && req.isUsuario;
     next();
-    
+
 })
 //bory-parser
 app.use(bodyoparser.urlencoded({ extended: true }))
@@ -67,17 +72,24 @@ app.use((req, res, next) => {
     next()
 })
 //Rotas
-app.get("/", (req, res) => {
-//console.log(req.user); 
-    Postagem.find().sort({ data: "desc" }).populate("categoria").lean().then((postagens) => {
+app.get("/",(req, res) => {
+    
+    Postagem.find().sort({ data: "desc" }).populate("categoria").populate("fkUsuario").lean().then((postagens) => {
         Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
-            res.render("index", { postagens: postagens, categorias: categorias, eAdmin: req.user && req.user.eAdmin });
+            
+            res.render("index", { postagens: postagens, categorias: categorias, eAdmin: req.user && req.user.eAdmin, isUsuario:req.user && req.isUsuario });
+        }).catch((erro) => {
+            console.log(erro)
+            req.flash("error_msg", "Ocorreu um erro interno!");
+            res.redirect("/404");
         });
     }).catch((erro) => {
-        req.flash("error_msg", "Ocorreu um erro interno!");
-        res.redirect("/404");
+        console.log(user)
+        console.log(erro);
+        res.status(500).send("Erro interno.");
     });
 });
+
 
 app.get("/404", (req, res) => {
     res.send("ERROR 404!")
@@ -97,28 +109,28 @@ app.get("/postagem/:slug", logado, (req, res) => {
     })
 })
 
-app.get("/filtrocategoria/:slug", (req, res)=>{
-    
-    Categoria.findOne({slug: req.params.slug}).lean().then((categoria)=>{
+app.get("/filtrocategoria/:slug", (req, res) => {
+
+    Categoria.findOne({ slug: req.params.slug }).lean().then((categoria) => {
         if (categoria) {
-            Postagem.find({categoria: categoria._id}).populate("categoria").lean().then((postagens)=>{
-                if(!postagens){
-                    res.render("postagem/porcategoria", {categria: categoria})
+            Postagem.find({ categoria: categoria._id }).populate("categoria").lean().then((postagens) => {
+                if (!postagens) {
+                    res.render("postagem/porcategoria", { categria: categoria })
                     console.log("segundo")
-                }else{
-                    Categoria.find().lean().then((categorias)=>{
+                } else {
+                    Categoria.find().lean().then((categorias) => {
                         console.log("primeiro")
-                        res.render("postagem/porcategoria", {postagens: postagens, categoria: categoria, categorias, categorias})
-                    }).catch((erro)=>{
-                        res.render("postagem/porcategoria", {categoria: categoria})
+                        res.render("postagem/porcategoria", { postagens: postagens, categoria: categoria, categorias, categorias })
+                    }).catch((erro) => {
+                        res.render("postagem/porcategoria", { categoria: categoria })
                     })
                 }
             })
         } else {
             req.flash("error_msg", "Categoria inexistente!")
             res.redirect("/")
-        }   
-    }).catch((erro)=>{
+        }
+    }).catch((erro) => {
         console.log(erro)
     })
 })
@@ -132,5 +144,5 @@ const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
-  console.log(`Servidor Node.js rodando em http://${HOST}:${PORT}`);
+    console.log(`Servidor Node.js rodando em http://${HOST}:${PORT}`);
 });

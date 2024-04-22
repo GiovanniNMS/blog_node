@@ -23,6 +23,11 @@ const postagem = new schema({
         ref: "categorias", 
         require: true
     },
+    fkUsuario:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "usuarios",
+        require: true
+    },
     data:{
         type: Date,
         default: Date.now()
