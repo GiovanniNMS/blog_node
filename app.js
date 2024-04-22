@@ -45,7 +45,7 @@ app.use((req, res, next) => {
     res.locals.userid = req.user ? req.user._id : null;
     res.locals.eAdmin = req.user && req.user.eAdmin;
     res.locals.logado = req.logado;
-    res.locals.isUsuario = req.user && req.isUsuario;
+    res.locals.isUsuario = req.isUsuario;
     next();
 
 })
@@ -72,12 +72,12 @@ app.use((req, res, next) => {
     next()
 })
 //Rotas
-app.get("/",(req, res) => {
+app.get("/", (req, res) => {
     
     Postagem.find().sort({ data: "desc" }).populate("categoria").populate("fkUsuario").lean().then((postagens) => {
         Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
             
-            res.render("index", { postagens: postagens, categorias: categorias, eAdmin: req.user && req.user.eAdmin, isUsuario:req.user && req.isUsuario });
+            res.render("index", { postagens: postagens, categorias: categorias});
         }).catch((erro) => {
             console.log(erro)
             req.flash("error_msg", "Ocorreu um erro interno!");

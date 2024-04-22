@@ -7,14 +7,10 @@ module.exports = {
         Postagem.find().lean().then((postagens) => {
             if (req.isAuthenticated() && postagens.length > 0) {
                 return next();
-            } else {
-                res.redirect("/404")
-            }
-                
-            
+            } 
         }).catch((erro) => {
-            res.status(500).send("Erro interno no eUsuario.");
-            console.log(erro)
+           
+            res.redirect("/404")
         });
     }
 };
