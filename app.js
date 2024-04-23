@@ -73,28 +73,36 @@ app.use((req, res, next) => {
 })
 //Rotas
 app.get("/", (req, res) => {
-    
     Postagem.find().sort({ data: "desc" }).populate("categoria").populate("fkUsuario").lean().then((postagens) => {
-        Categoria.find().sort({ date: 'desc' }).lean().then((categorias) => {
-            
-            res.render("index", { postagens: postagens, categorias: categorias});
+        Categoria.find().sort({ data: 'desc' }).lean().then((categorias) => {
+            postagens.forEach(postagem => {
+                if (postagem.fkUsuario && postagem.fkUsuario.email) {
+                    console.log(postagem.fkUsuario.email);
+                } else {
+                    console.log("Nome de usuário não disponível para esta postagem.");
+                }
+            });
+            res.render("index", { postagens: postagens, categorias: categorias });
         }).catch((erro) => {
-            console.log(erro)
+            console.log(erro);
             req.flash("error_msg", "Ocorreu um erro interno!");
             res.redirect("/404");
         });
     }).catch((erro) => {
-        console.log(user)
         console.log(erro);
         res.status(500).send("Erro interno.");
     });
 });
 
 
+
 app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
+app.get("/minhasPostagens/:id", (req, res)=>{
+    Postagem.find({fkUsuario: req.params.id})
+})
 app.get("/postagem/:slug", logado, (req, res) => {
     Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {
         if (postagem) {

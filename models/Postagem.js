@@ -26,7 +26,7 @@ const postagem = new schema({
     fkUsuario:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "usuarios",
-        require: true
+        required: true
     },
     data:{
         type: Date,

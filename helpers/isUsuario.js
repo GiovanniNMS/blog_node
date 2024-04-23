@@ -1,16 +1,10 @@
-const mongoose = require("mongoose");
-require("../models/Postagem.js")
-const Postagem = mongoose.model("postagens");
-
 module.exports = {
     isUsuario: function(req, res, next) {
-        Postagem.find().lean().then((postagens) => {
-            if (req.isAuthenticated() && postagens.length > 0) {
-                return next();
-            } 
+        Postagem.find({ fkUsuario: req.user._id }).lean().then((postagens) => {
+            res.locals.postagens = postagens; // Passa as postagens para as variáveis locais
+            return next();
         }).catch((erro) => {
-           
-            res.redirect("/404")
+            res.redirect("/404");
         });
     }
 };

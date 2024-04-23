@@ -108,8 +108,9 @@ router.get("/postagens", logado, (req, res) => {
 })
 
 router.get("/postagens/add", logado, (req, res) => {
-    Usuario.findOne().lean().then((usuarios) => {
+    Usuario.findOne({email: req.user.email}).lean().then((usuarios) => {
         Categoria.find().lean().then((categorias) => {
+            console.log(req.user.email)
             console.log(usuarios._id)
             res.render("admin/addpostagens", { categorias: categorias, usuarios: usuarios })
         }).catch((erro) => {
