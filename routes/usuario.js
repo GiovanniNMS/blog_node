@@ -5,161 +5,199 @@ require("../models/Usuario")
 const Usuario = mongoose.model("usuarios")
 const bcrypt = require("bcryptjs")
 const passport = require("passport")
+const nodemailer = require("nodemailer")
+const transport = nodemailer.createTransport({
+    host: "outlook.office365.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: "kesiagbani@outlook.com",
+        pass: "Gubani22?"
+    }
+})
 
-router.get("/registro", (req, res)=>{
+const transportGmail = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: "ydagalera123@gmail.com",
+        pass: "nodejs"
+    }
+})
+
+router.get("/registro", (req, res) => {
     res.render("usuarios/registro")
 })
 
-router.get("/login", (req, res)=>{
+router.get("/login", (req, res) => {
     res.render("usuarios/login")
 })
 
-router.post("/registro/novo", (req, res)=>{
+router.post("/registro/novo", (req, res) => {
     var erros = []
     if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
-        erros.push({texto: "Nome inválido!"})
+        erros.push({ texto: "Nome inválido!" })
     }
     if (!req.body.email || typeof req.body.email == undefined || req.body.email == null) {
-        erros.push({texto: "Email inválido!"})
+        erros.push({ texto: "Email inválido!" })
     }
     if (!req.body.senha || typeof req.body.senha == undefined || req.body.senha == null) {
-        erros.push({texto: "Senha inválida!"})
+        erros.push({ texto: "Senha inválida!" })
     }
     if (req.body.senha.length < 4) {
-        erros.push({texto: "Senha muito curta!"})
-        
+        erros.push({ texto: "Senha muito curta!" })
+
     }
     if (req.body.senha != req.body.senha2) {
-        erros.push({texto: "Senha diferentes! "})
+        erros.push({ texto: "Senhas diferentes! " })
     }
-    
-    if (erros.length > 0 ) {
-        res.render("usuarios/registro", {erros: erros})
-    }else{
-        Usuario.findOne({email: req.body.email}).lean().then((usuario) =>{
+
+    if (erros.length > 0) {
+        res.render("usuarios/registro", { erros: erros })
+    } else {
+        Usuario.findOne({ email: req.body.email }).lean().then((usuario) => {
             if (usuario) {
-                console.log("email ja cadastrado")
+                console.log("Email ja cadastrado")
                 req.flash("error_msg", "Email já cadastrado! Faça o login.")
                 res.redirect("/usuario/registro")
-            }else{
+            } else {
                 const novoUsuario = new Usuario({
                     nome: req.body.nome,
                     email: req.body.email,
                     senha: req.body.senha
                 })
-                bcrypt.genSalt(10,(erro, salt) =>{
-                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash)=>{
+                bcrypt.genSalt(10, (erro, salt) => {
+                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
                         if (erro) {
                             req.flash("error_msg", "Erro ao enviar cadastro do usuario")
                             res.render("usuarios/registro")
                         }
                         novoUsuario.senha = hash;
 
-                        novoUsuario.save().then(()=>{
+                        novoUsuario.save().then(() => {
                             req.flash("success_msg", "Cadastrado com Sucesso!")
                             res.redirect("/")
-                        }).catch((error)=>{
+                        }).catch((error) => {
                             req.flash("error_msg", "Erro ao cadastrar! Tente novamente!")
                             res.render("usuarios/resgistro")
                         })
                     })
                 })
             }
-        }).catch((erro)=>{
+        }).catch((erro) => {
             req.flash("error_msg", "Erro Interno!")
         })
     }
 })
 
-
-
-router.post("/addAdmin/novo", (req, res)=>{
+router.post("/addAdmin/novo", (req, res) => {
     var erros = []
     if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
-        erros.push({texto: "Nome inválido!"})
+        erros.push({ texto: "Nome inválido!" })
     }
     if (!req.body.email || typeof req.body.email == undefined || req.body.email == null) {
-        erros.push({texto: "Email inválido!"})
+        erros.push({ texto: "Email inválido!" })
     }
     if (!req.body.senha || typeof req.body.senha == undefined || req.body.senha == null) {
-        erros.push({texto: "Senha inválida!"})
+        erros.push({ texto: "Senha inválida!" })
     }
     if (req.body.senha.length < 4) {
-        erros.push({texto: "Senha muito curta!"})
-        
+        erros.push({ texto: "Senha muito curta!" })
+
     }
     if (req.body.senha != req.body.senha2) {
-        erros.push({texto: "Senha diferentes! "})
+        erros.push({ texto: "Senha diferentes! " })
     }
-    
-    if (erros.length > 0 ) {
-        res.render("admin/addAdmin", {erros: erros})
-    }else{
-        Usuario.findOne({email: req.body.email}).lean().then((usuario) =>{
+
+    if (erros.length > 0) {
+        res.render("admin/addAdmin", { erros: erros })
+    } else {
+        Usuario.findOne({ email: req.body.email }).lean().then((usuario) => {
             if (usuario) {
                 console.log("email ja cadastrado")
                 req.flash("error_msg", "Email já cadastrado! Faça o login.")
                 res.redirect("/admin/addAdmin")
-            }else{
+            } else {
                 const novoUsuario = new Usuario({
                     nome: req.body.nome,
                     email: req.body.email,
                     senha: req.body.senha,
                     eAdmin: 1
                 })
-                bcrypt.genSalt(10,(erro, salt) =>{
-                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash)=>{
+                bcrypt.genSalt(10, (erro, salt) => {
+                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
                         if (erro) {
                             req.flash("error_msg", "Erro ao enviar cadastro do usuario")
                             res.render("admin/addAdmin")
                         }
                         novoUsuario.senha = hash;
 
-                        novoUsuario.save().then(()=>{
+                        novoUsuario.save().then(() => {
                             req.flash("success_msg", "Cadastrado com Sucesso!")
                             res.redirect("/")
-                        }).catch((error)=>{
+                        }).catch((error) => {
                             req.flash("error_msg", "Erro ao cadastrar! Tente novamente!")
                             res.render("admin/addAdmin")
                         })
                     })
                 })
             }
-        }).catch((erro)=>{
+        }).catch((erro) => {
             req.flash("error_msg", "Erro Interno!")
         })
     }
-})  
-
-router.post("/login",
-    passport.authenticate('local', 
-    { successFlash: "/", 
-    failureRedirect: '/usuario/login', 
-    failureMessage: true, 
-    failureFlash:true}),
-  function(req, res, next) {
-    /*erro = []
-    if(!req.params.email || typeof req.params.email || req.params.email == null){
-        erro.push({texto: "Insira o email"})
-    }
-    if (erro.length > 0) {
-        res.render("usuarios/login", {erro: erro})
-    }else{
-        
-    }*/
-
-    res.redirect('/');
-    
 })
 
-router.get("/logout", (req, res)=>{
-    req.logout(function(err){
-        if(err){
+router.post("/login",
+    passport.authenticate('local',
+        {
+            successFlash: "/",
+            failureRedirect: '/usuario/login',
+            failureMessage: true,
+            failureFlash: true
+        }),
+    function (req, res, next) {
+        res.redirect('/');
+    })
+router.get("/recSenha", (req, res) => {
+    res.render("usuarios/recuperarSenha")
+})
+router.post("/emailRecSenha", (req, res) => {
+    Usuario.findOne({ email: req.body.email }).lean().then((email) => {
+        if(!email){
+            req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
+            res.redirect("recSenha")
+        }else{
+            transport.sendMail({
+                from: "Giovanni <kesiagbani@outlook.com>",
+                to: email.email,
+                subject: "Meu email",
+                html: "<h1>recuperar Senha corrigido</h1>",
+                text: "Não foi o html"
+            }).then(() => {
+                //console.log(email.nome)
+                console.log("E-mail enviado com sucesso!")
+                
+            }).catch((erro)=>{
+                req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
+                res.redirect("recSenha")
+                console.log(erro)
+            })
+            req.flash("success_msg", "E-mail de recuperação enviado!")
+                res.redirect("recSenha")
+        }
+        
+    })
+})
+
+router.get("/logout", (req, res) => {
+    req.logout(function (err) {
+        if (err) {
             return next(err)
         }
         req.flash("success_msg", "Deslogado!")
         res.redirect("/")
     })
-    
 })
-module.exports =  router
+module.exports = router
