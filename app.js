@@ -46,6 +46,7 @@ app.use((req, res, next) => {
     res.locals.eAdmin = req.user && req.user.eAdmin;
     res.locals.logado = req.logado;
     res.locals.isUsuario = req.isUsuario;
+    //res.locals.emailUser = req.user && req.user.email
     next();
 
 })
@@ -75,13 +76,6 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
     Postagem.find().sort({ data: "desc" }).populate("categoria").populate("fkUsuario").lean().then((postagens) => {
         Categoria.find().sort({ data: 'desc' }).lean().then((categorias) => {
-            postagens.forEach(postagem => {
-                if (postagem.fkUsuario && postagem.fkUsuario.email) {
-                    console.log(postagem.fkUsuario.email);
-                } else {
-                    console.log("Nome de usuário não disponível para esta postagem.");
-                }
-            });
             res.render("index", { postagens: postagens, categorias: categorias });
         }).catch((erro) => {
             console.log(erro);
@@ -100,8 +94,23 @@ app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/minhasPostagens/:id", (req, res)=>{
-    Postagem.find({fkUsuario: req.params.id})
+app.get("/minhasPostagens", logado, (req, res)=>{
+
+    Usuario.findOne({ email: req.user.email }).then((usuario) => {
+        if (!usuario) {
+            throw new Error('Usuário não encontrado');
+        }
+        // Use o ID do usuário encontrado na consulta de postagens
+        return Postagem.find({ fkUsuario: usuario._id }).populate("categoria").lean();
+    }).then((postagens) => {
+        Categoria.find().lean().then((categorias)=>{
+            res.render("postagem/minhasPostagens", { postagens: postagens, categorias: categorias });
+        })
+        
+    }).catch((erro) => {
+        console.log(erro);
+        res.status(500).send("Erro ao buscar postagens do usuário.");
+    });
 })
 app.get("/postagem/:slug", logado, (req, res) => {
     Postagem.find({ slug: req.params.slug }).populate("categoria").lean().then((postagem) => {

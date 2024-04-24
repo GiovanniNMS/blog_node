@@ -1,14 +1,3 @@
-<script>
-  window.onload = function () {
-    document.getElementById('close').onclick = function () {
-      this.parentNode.parentNode.remove()
-      return false;
-    };
-
-
-  };
-</script>
-
 <h2>Postagens: </h2>
 <hr>
 <a href="/admin/postagens/add"><button class="btn btn-success">Nova Postagem</button></a>
@@ -17,7 +6,7 @@
     Filtrar Por Categoria:
   </a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/">Todos</a></li>
+    <li><a class="dropdown-item" href="/minhasPostagens">Todos</a></li>
     <hr>
 
     {{#each categorias}}
@@ -39,8 +28,8 @@
           </svg>
         </a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item text-capitalize" href="/admin/postagens/{{this._id}}/edit">Editar</a></li>
-          <li><a href="/admin/postagens/{{this._id}}/delete" class="dropdown-item text-capitalze">Excluir</a></li>
+          <li><a class="dropdown-item text-capitalize" href="/admin/postagens/edit/{{_id}}">Editar</a></li>
+          <li><a href="/admin/postagens/deletar/{{_id}}" class="dropdown-item text-capitalze">Excluir</a></li>
         </ul>
       </li>
     </ul>
