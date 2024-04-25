@@ -186,6 +186,7 @@ router.post("/emailRecSenha", (req, res) => {
                 text: "Não foi o html"
             }).then(() => {
                 //console.log(email.nome)
+                //cometario teste
                 console.log("E-mail enviado com sucesso!")
                 
             }).catch((erro)=>{
