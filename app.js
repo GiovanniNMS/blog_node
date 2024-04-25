@@ -152,32 +152,50 @@ app.get("/filtrocategoria/:slug", (req, res) => {
     })
 })
 
-app.get("/filtroMinhasPostagens/:slug", (req, res) => {
+app.get("/filtroMinhasPostagens/:slug", logado, (req, res) => {
     Usuario.findOne({ email: req.user.email }).then((usuario) => {
         if (!usuario) {
             throw new Error('Usuário não encontrado');
         }
         console.log(usuario._id);
         // Use o ID do usuário encontrado na consulta de postagens
-        return Categoria.findOne({ slug: req.params.slug }).lean().then((categoria) => {
-            
-            Postagem.find({ fkUsuario: usuario._id }).lean().then((postagens) => {
-            if (!postagens || postagens.length === 0) {
-                console.log("postagens não encontradas");
-                res.render("postagem/filtroMinhasPostagens", { postagens: [], categoria: {}, categorias: [] });
-            } else {
+        Categoria.findOne({ slug: req.params.slug }).lean().then((categoria) => {
+            if (!categoria) {
+                req.flash("error_msg", "Categoria inexistente!");
+                return res.redirect("/");
+            }
+
+            Postagem.find({ fkUsuario: usuario._id, categoria: categoria._id }).populate("categoria").lean().then((postagens) => {
+                if (!postagens || postagens.length === 0) {
+                    console.log("postagens não encontradas");
+                    return res.render("postagem/filtroMinhasPostagens", { postagens: [], categoria: categoria, categorias: [] });
+                }
+
+                // Verificando se postagens.fkUsuario existe antes de comparar
+                postagens.forEach((postagem) => {
+                    if (postagem.fkUsuario && usuario._id) {
+                        if (usuario._id.toString() === postagem.fkUsuario.toString()) {
+                            console.log("Postagem encontrada para o usuário: " + usuario._id);
+                        } else {
+                            console.log("Postagem não pertence ao usuário: " + usuario._id);
+                        }
+                    } else {
+                        console.log("Faltando informações para a comparação.");
+                    }
+                });
+
                 Categoria.find().lean().then((categorias) => {
                     console.log("postagens encontradas: " + usuario._id);
-                    res.render("postagem/filtroMinhasPostagens", { postagens: postagens, categoria:categoria,  categorias: categorias });
+                    res.render("postagem/filtroMinhasPostagens", { postagens: postagens, categoria: categoria,  categorias: categorias });
                 });
-            }
+            });
         });
     }).catch((erro) => {
         console.log(erro);
         res.status(500).send("Erro ao buscar postagens do usuário.");
     });
-})
-})
+});
+
 
 //Outros
 app.use("/admin", admin)
