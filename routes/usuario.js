@@ -171,14 +171,12 @@ router.post("/login",
     function (req, res, next) {
         res.redirect('/');
     })
-router.get("/recSenha", (req, res) => {
-    res.render("usuarios/recuperarSenha")
-})
+
 router.post("/emailRecSenha", (req, res) => {
     Usuario.findOne({ email: req.body.email }).lean().then((email) => {
         if(!email){
             req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
-            res.redirect("recSenha")
+            res.redirect("/usuario/login")
         }else{
             transport.sendMail({
                 from: "Giovanni <kesiagbani@outlook.com>",
@@ -192,11 +190,11 @@ router.post("/emailRecSenha", (req, res) => {
                 
             }).catch((erro)=>{
                 req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
-                res.redirect("recSenha")
+                res.redirect("/usuario/login")
                 console.log(erro)
             })
             req.flash("success_msg", "E-mail de recuperação enviado!")
-                res.redirect("recSenha")
+                res.redirect("/usuario/login")
         }
         
     })
