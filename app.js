@@ -94,7 +94,7 @@ app.get("/404", (req, res) => {
     res.send("ERROR 404!")
 })
 
-app.get("/minhasPostagens", logado, (req, res)=>{
+app.get("/minhasPostagens", logado, (req, res) => {
 
     Usuario.findOne({ email: req.user.email }).then((usuario) => {
         if (!usuario) {
@@ -103,10 +103,10 @@ app.get("/minhasPostagens", logado, (req, res)=>{
         // Use o ID do usuário encontrado na consulta de postagens
         return Postagem.find({ fkUsuario: usuario._id }).populate("categoria").lean();
     }).then((postagens) => {
-        Categoria.find().lean().then((categorias)=>{
+        Categoria.find().lean().then((categorias) => {
             res.render("postagem/minhasPostagens", { postagens: postagens, categorias: categorias });
         })
-        
+
     }).catch((erro) => {
         console.log(erro);
         res.status(500).send("Erro ao buscar postagens do usuário.");
@@ -150,6 +150,33 @@ app.get("/filtrocategoria/:slug", (req, res) => {
     }).catch((erro) => {
         console.log(erro)
     })
+})
+
+app.get("/filtroMinhasPostagens/:slug", (req, res) => {
+    Usuario.findOne({ email: req.user.email }).then((usuario) => {
+        if (!usuario) {
+            throw new Error('Usuário não encontrado');
+        }
+        console.log(usuario._id);
+        // Use o ID do usuário encontrado na consulta de postagens
+        return Categoria.findOne({ slug: req.params.slug }).lean().then((categoria) => {
+            
+            Postagem.find({ fkUsuario: usuario._id }).lean().then((postagens) => {
+            if (!postagens || postagens.length === 0) {
+                console.log("postagens não encontradas");
+                res.render("postagem/filtroMinhasPostagens", { postagens: [], categoria: {}, categorias: [] });
+            } else {
+                Categoria.find().lean().then((categorias) => {
+                    console.log("postagens encontradas: " + usuario._id);
+                    res.render("postagem/filtroMinhasPostagens", { postagens: postagens, categoria:categoria,  categorias: categorias });
+                });
+            }
+        });
+    }).catch((erro) => {
+        console.log(erro);
+        res.status(500).send("Erro ao buscar postagens do usuário.");
+    });
+})
 })
 
 //Outros
