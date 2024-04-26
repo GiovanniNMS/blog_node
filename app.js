@@ -166,10 +166,6 @@ app.get("/filtroMinhasPostagens/:slug", logado, (req, res) => {
             }
 
             Postagem.find({ fkUsuario: usuario._id, categoria: categoria._id }).populate("categoria").lean().then((postagens) => {
-                if (!postagens || postagens.length === 0) {
-                    console.log("postagens não encontradas");
-                    return res.render("postagem/filtroMinhasPostagens", { postagens: [], categoria: categoria, categorias: [] });
-                }
 
                 // Verificando se postagens.fkUsuario existe antes de comparar
                 postagens.forEach((postagem) => {
@@ -187,7 +183,9 @@ app.get("/filtroMinhasPostagens/:slug", logado, (req, res) => {
                 Categoria.find().lean().then((categorias) => {
                     console.log("postagens encontradas: " + usuario._id);
                     res.render("postagem/filtroMinhasPostagens", { postagens: postagens, categoria: categoria,  categorias: categorias });
-                });
+                }).catch((erro)=>{
+                    res.render("postagem/filtroMinhasPostagens", {categoria: categoria,  categorias: categorias })
+                })
             });
         });
     }).catch((erro) => {
