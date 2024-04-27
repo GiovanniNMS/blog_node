@@ -18,6 +18,10 @@ const usuario =new schema({
     senha:{
         type: String,
         require: true
+    },
+    token:{
+        type: String,
+        default: " "
     }
 
 })

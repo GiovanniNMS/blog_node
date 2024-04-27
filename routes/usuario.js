@@ -14,8 +14,8 @@ const transport = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: "kesiagbani@outlook.com",
-        pass: "Gubani22?"
+        user: "giovanni.ofice@hotmail.com",
+        pass: "sopaio123"
     }
 })
 
@@ -171,35 +171,76 @@ router.post("/login",
     function (req, res, next) {
         res.redirect('/');
     })
-
-router.post("/emailRecSenha", (req, res) => {
-    Usuario.findOne({ email: req.body.email }).lean().then((email) => {
-        if(!email){
-            req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
-            res.redirect("/usuario/login")
-        }else{
-            transport.sendMail({
-                from: "Giovanni <kesiagbani@outlook.com>",
-                to: email.email,
-                subject: "Meu email",
-                html: "<h1>recuperar Senha corrigido</h1>",
-                text: "Não foi o html"
-            }).then(() => {
-                //console.log(email.nome)
-                //cometario teste
-                console.log("E-mail enviado com sucesso!")
-                
-            }).catch((erro)=>{
+    router.post("/emailRecSenha", (req, res) => {
+        Usuario.findOne({ email: req.body.email }).then((usuario) => {
+            if (!usuario) {
                 req.flash("error_msg", "E-mail não cadastrado! Faça seu cadastro.")
-                res.redirect("/usuario/login")
-                console.log(erro)
-            })
-            req.flash("success_msg", "E-mail de recuperação enviado!")
-                res.redirect("/usuario/login")
-        }
-        
-    })
-})
+                return res.redirect("/usuario/login");
+            } else {
+                const novoToken = (Math.random() + 1).toString(36).substring(7);
+    
+                transport.sendMail({
+                    from: "Blog Nodejs <giovanni.ofice@hotmail.com>",
+                    to: usuario.email,
+                    subject: "RECUPERAÇÃO DE SENHA BLOG NODEJS",
+                    html: `<h1>Recuperação de Senha</h1>
+                    <form action="http://54.207.20.29:3000/usuario/resetSenha" method="post">
+                    <input type="hidden" name="token" value="${novoToken}">
+                    <h4>Nova senha:</h4>
+                    <input type="password" name="novasenha" id="">
+                    <h4>Repita a senha:</h4>
+                    <input type="password" name="novasenha2" id="">
+                    <button type="submit">Salvar</button>
+                    </form>`,
+                    text: "Não foi o html"
+                }).then(() => {
+                    console.log("E-mail enviado com sucesso!");
+                    usuario.token = novoToken;
+                    usuario.save().then(() => {
+                        console.log("Token ok!");
+                    });
+                    req.flash("success_msg", "E-mail de recuperação enviado!");
+                    res.redirect("/usuario/login");
+                }).catch((erro) => {
+                    req.flash("error_msg", "Erro ao enviar e-mail de recuperação!");
+                    console.error(erro);
+                    res.redirect("/usuario/login");
+                });
+            }
+        });
+    });
+    
+    router.post("/resetSenha", (req, res) => {
+        const { token, novasenha, novasenha2 } = req.body;
+    
+        Usuario.findOne({ token }).then((usuario) => {
+            if (!usuario) {
+                req.flash("error_msg", "Token inválido ou expirado!");
+                return res.redirect("/usuario/login");
+            }
+    
+            if (novasenha !== novasenha2) {
+                req.flash("error_msg", "As senhas não coincidem!");
+                return res.redirect(`/usuario/resetSenha?token=${token}`);
+            }
+    
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(novasenha, salt, (err, hash) => {
+                    if (err) throw err;
+                    usuario.senha = hash;
+                    usuario.token = undefined;
+                    usuario.save().then(() => {
+                        req.flash("success_msg", "Senha alterada com sucesso!");
+                        res.redirect("/usuario/login");
+                    }).catch((err) => {
+                        req.flash("error_msg", "Erro ao salvar a nova senha!");
+                        console.error(err);
+                        res.redirect("/usuario/login");
+                    });
+                });
+            });
+        });
+    });
 
 router.get("/logout", (req, res) => {
     req.logout(function (err) {
