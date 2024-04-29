@@ -1,0 +1,13 @@
+<div class="card align-midlle">
+    <div class="card-body">
+        <form action="/usuario/resetSenha" method="post">
+            <input type="hidden" name="id" value="{{usuario._id}}">
+            <h1>Alteração de senha</h1>
+            <h4 class="mt-4">Nova senha:</h4>
+            <input type="password" name="novaSenha" id="" placeholder="Nova Senha" class="form-control mt-3" required>
+            <h4 class="mt-4">Repita a senha:</h4>
+            <input type="password" name="novaSenha2" id="" class="form-control mt-3" placeholder="Repeita a senha" required>
+            <button type="submit" class="btn btn-success mt-4">Salvar</button>
+        </form>
+    </div>
+</div>

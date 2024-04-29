@@ -171,6 +171,7 @@ router.post("/login",
     function (req, res, next) {
         res.redirect('/');
     })
+
     router.post("/emailRecSenha", (req, res) => {
         Usuario.findOne({ email: req.body.email }).then((usuario) => {
             if (!usuario) {
@@ -183,15 +184,7 @@ router.post("/login",
                     from: "Blog Nodejs <giovanni.ofice@hotmail.com>",
                     to: usuario.email,
                     subject: "RECUPERAÇÃO DE SENHA BLOG NODEJS",
-                    html: `<h1>Recuperação de Senha</h1>
-                    <form action="http://54.207.20.29:3000/usuario/resetSenha" method="post">
-                    <input type="hidden" name="token" value="${novoToken}">
-                    <h4>Nova senha:</h4>
-                    <input type="password" name="novasenha" id="">
-                    <h4>Repita a senha:</h4>
-                    <input type="password" name="novasenha2" id="">
-                    <button type="submit">Salvar</button>
-                    </form>`,
+                    html: `<h1>Código de recuperação</h1><h3>${novoToken}</h3>`,
                     text: "Não foi o html"
                 }).then(() => {
                     console.log("E-mail enviado com sucesso!");
@@ -200,7 +193,7 @@ router.post("/login",
                         console.log("Token ok!");
                     });
                     req.flash("success_msg", "E-mail de recuperação enviado!");
-                    res.redirect("/usuario/login");
+                    res.redirect("/usuario/tokenRecSenha");
                 }).catch((erro) => {
                     req.flash("error_msg", "Erro ao enviar e-mail de recuperação!");
                     console.error(erro);
@@ -209,37 +202,78 @@ router.post("/login",
             }
         });
     });
+
+    router.get("/tokenRecSenha", (req, res)=>{
+        res.render("usuarios/tokenRecSenha")
+    })
+
+    router.post("/tokenRecSenha/form", (req, res)=>{
+        Usuario.findOne({token: req.body.token}).lean().then((usuario)=>{
+            if (usuario) {
+                console.log(usuario.nome)
+                res.render("usuarios/resetSenhaForm", {usuario: usuario})
+            }else{
+                console.log(req.body.token)
+                req.flash("error_msg", "Token inválido! Verifique seu e-mail.")
+                res.redirect("/usuario/tokenRecSenha")
+            }
+            
+        }).catch((erro)=>{
+            console.log(erro)
+        })
+    })
+
+    router.post("/resetSenha", async (req, res) => {
+        const novaSenha2 = req.body.novaSenha2;
+        const novaSenha = req.body.novaSenha;
+        const id = req.body.id;
     
-    router.post("/resetSenha", (req, res) => {
-        const { token, novasenha, novasenha2 } = req.body;
-    
-        Usuario.findOne({ token }).then((usuario) => {
+        const erros = [];
+
+        if(!novaSenha && novaSenha2 || typeof novaSenha && novaSenha2 === undefined || novaSenha && novaSenha2 === null){
+            erros.push({menssagem: "Senhas inválidas! "})
+        }
+        if (novaSenha != novaSenha2 ) {
+            erros.push({menssagem: "Senhas difenrentes! Tente novamente."})
+        }
+        
+        if (erros > 0) {
+            res.render("/usuario/tokenSenha/form", {erros: erros})
+        }
+        Usuario.findOne({_id: req.body.id}).then((usuario)=>{
             if (!usuario) {
-                req.flash("error_msg", "Token inválido ou expirado!");
-                return res.redirect("/usuario/login");
+                req.flash("error_msg", "Usuário não encontrado!");
+                return res.render("usuarios/resetSenhaForm");
             }
-    
-            if (novasenha !== novasenha2) {
-                req.flash("error_msg", "As senhas não coincidem!");
-                return res.redirect(`/usuario/resetSenha?token=${token}`);
-            }
-    
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(novasenha, salt, (err, hash) => {
-                    if (err) throw err;
+
+            // Gera o hash da nova senha
+            bcrypt.genSalt(10, (erro, salt) => {
+                if (erro) {
+                    req.flash("error_msg", "Erro ao gerar hash da senha.");
+                    return res.render("admin/addAdmin");
+                }
+
+                bcrypt.hash(novaSenha, salt, (erro, hash) => {
+                    if (erro) {
+                        req.flash("error_msg", "Erro ao criar hash da senha.");
+                        return res.render("admin/addAdmin");
+                    }
+
+                    // Atualiza a senha do usuário com o novo hash
                     usuario.senha = hash;
-                    usuario.token = undefined;
+
+                    // Salva as alterações no banco de dados
                     usuario.save().then(() => {
-                        req.flash("success_msg", "Senha alterada com sucesso!");
-                        res.redirect("/usuario/login");
-                    }).catch((err) => {
-                        req.flash("error_msg", "Erro ao salvar a nova senha!");
-                        console.error(err);
-                        res.redirect("/usuario/login");
+                        req.flash("success_msg", "Senha resetada com sucesso!");
+                        res.redirect("/");
+                    }).catch((error) => {
+                        req.flash("error_msg", "Erro ao salvar a nova senha.");
+                        res.render("admin/addAdmin");
                     });
                 });
             });
-        });
+            
+        })
     });
 
 router.get("/logout", (req, res) => {
