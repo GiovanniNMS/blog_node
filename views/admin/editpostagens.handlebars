@@ -4,7 +4,11 @@
 
 <div class="card">
     <div class="card-body">
+        {{#if eAdmin}}
         <form action="/admin/postagens/edit" method="post">
+        {{else}}
+        <form action="/usuario/postagens/edit" method="post">
+        {{/if}}
             <input type="hidden" name="id" value="{{postagens._id}}">
             
             <label for="titulo" class="mt-2" >Titulo:</label>

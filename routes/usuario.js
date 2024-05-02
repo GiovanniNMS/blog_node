@@ -2,12 +2,17 @@ const express = require("express")
 const router = express.Router()
 const mongoose = require("mongoose")
 require("../models/Usuario")
+require("../models/Postagem")
+require("../models/Categoria")
 const Usuario = mongoose.model("usuarios")
+const Postagem = mongoose.model("postagens")
+const Categoria = mongoose.model("categorias")
 const bcrypt = require("bcryptjs")
 const passport = require("passport")
 const nodemailer = require("nodemailer")
 const emailValidator = require("email-validator")
 const emailExistence = require("email-existence")
+const { logado } = require("../helpers/logado.js")
 
 const transport = nodemailer.createTransport({
     host: "outlook.office365.com",
@@ -26,7 +31,35 @@ router.get("/registro", (req, res) => {
 router.get("/login", (req, res) => {
     res.render("usuarios/login")
 })
+router.get("/postagens/edit/:id", logado, (req, res) => {
+    Postagem.findOne({ _id: req.params.id }).lean().then((postagens) => {
 
+        Categoria.find().lean().then((categorias) => {
+                res.render("admin/editpostagens", { postagens: postagens, categorias: categorias })
+        }).catch((erro) => {
+
+        })
+    }).catch((erro) => {
+
+    })
+})
+router.post("/postagens/edit", logado, (req, res) => {
+    Postagem.findOne({ _id: req.body.id }).then((postagens) => {
+
+        postagens.titulo = req.body.titulo
+        postagens.slug = req.body.slug
+        postagens.descricao = req.body.descricao
+        postagens.categoria = req.body.categoria
+        postagens.conteudo = req.body.conteudo
+
+        postagens.save().then(() => {
+            req.flash("success_msg", "Postagem  Editada")
+                res.redirect("/minhasPostagens")            
+        }).catch((erro) => {
+            req.flash("error_msg", "Erro ao editar postagem")
+        })
+    })
+})
 router.post("/registro/novo", (req, res) => {
     const erros = [];
 

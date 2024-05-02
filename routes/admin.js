@@ -163,7 +163,7 @@ router.get("/postagens/edit/:id", logado, (req, res) => {
     Postagem.findOne({ _id: req.params.id }).lean().then((postagens) => {
 
         Categoria.find().lean().then((categorias) => {
-            res.render("admin/editpostagens", { postagens: postagens, categorias: categorias })
+                res.render("admin/editpostagens", { postagens: postagens, categorias: categorias })
         }).catch((erro) => {
 
         })
@@ -182,7 +182,7 @@ router.post("/postagens/edit", logado, (req, res) => {
 
         postagens.save().then(() => {
             req.flash("success_msg", "Postagem  Editada")
-            res.redirect("/admin/postagens")
+                res.redirect("/admin/postagens")            
         }).catch((erro) => {
             req.flash("error_msg", "Erro ao editar postagem")
         })
